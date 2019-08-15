@@ -112,11 +112,13 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	activateTime = hardware["rtime"];
 	lockType = hardware["ltype"];
 	relayType = hardware["rtype"];
+
 #ifndef OFFICIALBOARD
 	relayPin = hardware["rpin"];
 	pinMode(relayPin, OUTPUT);
 	digitalWrite(relayPin, !relayType);
 #endif
+
 	const char *ssid = network["ssid"];
 	const char *password = network["pswd"];
 	wmode = network["wmode"];
@@ -126,8 +128,17 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	{
 		int hid = network["hide"];
 #ifdef DEBUG
-		Serial.println(F("[ INFO ] RFID is running in AP Mode "));
+		Serial.println(F("[ INFO ] 设备AP模式"));
 #endif
+		const char *APssid;
+		if (network.containsKey("ssid"))
+		{
+			APssid = network["ssid"];
+		}
+		else
+		{
+			APssid = "192.168.4.1";
+		}
 		const char *apipch;
 		if (network.containsKey("apip"))
 		{
@@ -150,7 +161,7 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 		IPAddress apsubnet;
 		apip.fromString(apipch);
 		apsubnet.fromString(apsubnetch);
-		return startAP(apip, apsubnet, hid, ssid, password);
+		return startAP(apip, apsubnet, hid, APssid, password);
 	}
 	else
 	{

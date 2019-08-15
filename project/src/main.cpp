@@ -1,21 +1,20 @@
 
-#define VERSION "1.0.0"
+#define VERSION "0.1.2"
 
-#include "Arduino.h"
+//#include "Arduino.h"
 #include <ESP8266WiFi.h>
-#include <SPI.h>
+//#include <SPI.h>
 #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 #include <FS.h>
-//#include <_time.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <TimeLib.h>
+//#include <TimeLib.h>
 
 #include <Ticker.h>
 #include "Ntp.h"
 #include <AsyncMqttClient.h>
-#include <Bounce2.h>
+#include <btn.h>
 
  // #define DEBUG
 
@@ -151,7 +150,7 @@ void ICACHE_FLASH_ATTR setup()
 	Serial.begin(115200);
 	Serial.println();
 
-	Serial.print(F("[ INFO ] ESP RFID v"));
+	Serial.print(F("[ INFO ] Q manager v"));
 	Serial.println(VERSION);
 
 	uint32_t realSize = ESP.getFlashChipRealSize();

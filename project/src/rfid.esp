@@ -2,7 +2,6 @@ void ICACHE_FLASH_ATTR rfidloop()
 {
 	String uid = "";
 	String type = "";
-#ifndef OFFICIALBOARD
 	if (readertype == 0)
 	{
 		if (!mfrc522.PICC_IsNewCardPresent())
@@ -17,21 +16,21 @@ void ICACHE_FLASH_ATTR rfidloop()
 		}
 		mfrc522.PICC_HaltA();
 		cooldown = millis() + 2000;
-#ifdef DEBUG
+		#ifdef DEBUG
 		Serial.print(F("[ INFO ] PICC's UID: "));
-#endif
+		#endif
 		for (int i = 0; i < mfrc522.uid.size; ++i)
 		{
 			uid += String(mfrc522.uid.uidByte[i], HEX);
 		}
-#ifdef DEBUG
+		#ifdef DEBUG
 		Serial.print(uid);
-#endif
+		#endif
 		MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
 		type = mfrc522.PICC_GetTypeName(piccType);
-#ifdef DEBUG
+		#ifdef DEBUG
 		Serial.print(" " + type);
-#endif
+		#endif
 	}
 	else if (readertype == 1) //WG
 	{
@@ -186,7 +185,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 		delay(50);
 		return;
 	}
-#endif
+
 #ifdef OFFICIALBOARD
 	if (wg.available())
 	{
