@@ -18,17 +18,10 @@
 
  // #define DEBUG
 
-#ifdef OFFICIALBOARD
-
-#include <Wiegand.h>
-
-WIEGAND wg;
-int relayPin = 13;
-
-#endif
-
 #ifndef OFFICIALBOARD
 
+//#include <SoftwareSerial.h>
+#include <RDM6300.h>
 #include <MFRC522.h>
 #include "PN532.h"
 #include <Wiegand.h>
@@ -126,6 +119,11 @@ unsigned long interval 	= 1800;  // Add to GUI & json config
 bool mqttEvents 		= false; // Sends events over MQTT disables SPIFFS file logging
 
 
+#define RFID_RX_PIN 13
+#define RFID_TX_PIN 15
+
+RDM6300 RDM(RFID_RX_PIN, RFID_TX_PIN);
+
 #include "log.esp"
 #include "mqtt.esp"
 #include "helpers.esp"
@@ -137,20 +135,35 @@ bool mqttEvents 		= false; // Sends events over MQTT disables SPIFFS file loggin
 #include "webserver.esp"
 #include "door.esp"
 
-void ICACHE_FLASH_ATTR setup()
-{
-#ifdef OFFICIALBOARD
-	// Set relay pin to LOW signal as early as possible
-	pinMode(13, OUTPUT);
-	digitalWrite(13, LOW);
-	delay(200);
-#endif
 
+int tag;
+
+void  setup() {
+  Serial.begin(115200);
+  Serial.println("Serial Ready");
+
+}
+
+void  loop() {
+  if(RDM.isIdUartAvailable()) {
+    //tag = RDM.readId();
+    Serial.print("isIdUartAvailable");
+    Serial.println(RDM.realTagString);
+  }
+  if(RDM.isIdAvailable()) {
+  tag = RDM.readId();
+    Serial.print("ID: ");
+    Serial.println(tag,HEX);
+  }
+}
+
+void ICACHE_FLASH_ATTR setup1()
+{
 #ifdef DEBUG
 	Serial.begin(115200);
 	Serial.println();
 
-	Serial.print(F("[ INFO ] Q manager v"));
+	Serial.print(F("[ INFO ] Q RFID v"));
 	Serial.println(VERSION);
 
 	uint32_t realSize = ESP.getFlashChipRealSize();
@@ -207,7 +220,7 @@ void ICACHE_FLASH_ATTR setup()
 	writeEvent("INFO", "sys", "System setup completed, running", "");
 }
 
-void ICACHE_RAM_ATTR loop()
+void ICACHE_RAM_ATTR loop1()
 {
 	currentMillis = millis();
 	deltaTime = currentMillis - previousLoopMillis;
