@@ -1,6 +1,6 @@
 void connectToMqtt() {
 #ifdef DEBUG
-	Serial.println("[ INFO ] try to connect mqtt ");
+	Serial.println("[ 提醒 ] try to connect mqtt ");
 #endif
 	mqttClient.connect();
 }
@@ -33,7 +33,7 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
 		reasonstr = "Unknown";
 		break;
 	}
-	writeEvent("WARN", "mqtt", "Disconnected from MQTT server", reasonstr);
+	writeEvent("警告", "mqtt", "Disconnected from MQTT server", reasonstr);
 	
 	if (WiFi.isConnected()) {
 		//mqttClient.setServer(mhs, mport);
@@ -55,7 +55,7 @@ void mqtt_publish_boot(time_t boot_time, String const &wifi, String const &ip) {
 	root.printTo(mqttBuffer_boot);
 	mqttClient.publish(topic, 0, false, mqttBuffer_boot.c_str());
 #ifdef DEBUG
-	Serial.print("[ INFO ] Mqtt Publish:");
+	Serial.print("[ 提醒 ] Mqtt Publish:");
 	Serial.println(mqttBuffer_boot);
 #endif
 }
@@ -77,7 +77,7 @@ void mqtt_publish_heartbeat(time_t heartbeat) {
 	root.printTo(mqttBuffer4);
 	mqttClient.publish(stopic.c_str(), 0, false, mqttBuffer4.c_str());
 	#ifdef DEBUG
-		Serial.print("[ INFO ] Mqtt Publish:");
+		Serial.print("[ 提醒 ] Mqtt Publish:");
 		Serial.println(mqttBuffer4);
 	#endif
 }
@@ -104,7 +104,7 @@ void mqtt_publish_access(time_t accesstime, String const &isknown, String const 
 		root.printTo(mqttBuffer);
 		mqttClient.publish(stopic.c_str(), 0, false, mqttBuffer.c_str());
 		#ifdef DEBUG
-			Serial.print("[ INFO ] Mqtt Publish:");
+			Serial.print("[ 提醒 ] Mqtt Publish:");
 			Serial.println(mqttBuffer);
 		#endif
 	}
@@ -121,7 +121,7 @@ void mqtt_publish_event(JsonObject *root) {
 }
 
 void onMqttPublish(uint16_t packetId) {
-	writeEvent("INFO", "mqtt", "MQTT publish acknowledged", String(packetId));
+	writeEvent("提醒", "mqtt", "MQTT publish acknowledged", String(packetId));
 }
 
 
@@ -136,7 +136,7 @@ void ICACHE_FLASH_ATTR getUserList(int todo) {
 	JsonArray &users = root.createNestedArray("list");
 	Dir dir = SPIFFS.openDir("/P/");
 	#ifdef DEBUG
-		Serial.println("[ INFO ] getUserList");
+		Serial.println("[ 提醒 ] getUserList");
 	#endif
 	while (dir.next()) {
 			JsonObject &item = users.createNestedObject();
@@ -156,7 +156,7 @@ void ICACHE_FLASH_ATTR getUserList(int todo) {
 					json.printTo(mqttBuffer);
 					mqttClient.publish(stopic.c_str(), 0, false, mqttBuffer.c_str());
 					#ifdef DEBUG
-						Serial.print("[ INFO ] Mqtt Publish:");
+						Serial.print("[ 提醒 ] Mqtt Publish:");
 						Serial.println(mqttBuffer);
 					#endif
 				}
@@ -181,14 +181,14 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 	Serial.println(espIp);
 	StaticJsonBuffer<255> jsonBuffer;
 	#ifdef DEBUG
-		Serial.print("[ INFO ] JSON msg :");
+		Serial.print("[ 提醒 ] JSON msg :");
 		Serial.println(jjson);
 	#endif
 
 	JsonObject &root = jsonBuffer.parseObject(jjson);
 	if (!root.success()){
 		#ifdef DEBUG
-			Serial.print("[ INFO ] Failed parse MQTT message :");
+			Serial.print("[ 提醒 ] Failed parse MQTT message :");
 			Serial.println(jjson);
 		#endif
 		return;
@@ -201,9 +201,9 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 
 		if (!((strcmp(ipadr, espIp.c_str())==0) && (ipadr != NULL))){
 			#ifdef DEBUG
-				Serial.print("[ INFO ] ESP  IP: ");
+				Serial.print("[ 提醒 ] ESP  IP: ");
 				Serial.println(espIp);
-				Serial.print("[ INFO ] recv IP: ");
+				Serial.print("[ 提醒 ] recv IP: ");
 				Serial.println(ipadr);
 			#endif
 			return;
@@ -228,7 +228,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 
 	else if (strcmp(command, "listusr") == 0){
 		#ifdef DEBUG
-			Serial.println("[ INFO ] List usees");
+			Serial.println("[ 提醒 ] List usees");
 		#endif
 		getUserList(1);
 		return;
@@ -236,7 +236,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 
 	else if (strcmp(command, "opendoor") == 0){
 		#ifdef DEBUG
-			Serial.println("[ INFO ] Door open");
+			Serial.println("[ 提醒 ] Door open");
 		#endif
 		activateRelay = true;
 		previousMillis = millis();
@@ -246,7 +246,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 
 	else if (strcmp(command, "deletusers") == 0){
 		#ifdef DEBUG
-			Serial.println("[ INFO ] Delete all users");
+			Serial.println("[ 提醒 ] Delete all users");
 		#endif
 		DeleteAllUserFiles();
 		return;
@@ -255,7 +255,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 	else if (strcmp(command, "adduser") == 0){
 
 		#ifdef DEBUG
-			Serial.print("[ INFO ] Add Users :");
+			Serial.print("[ 提醒 ] Add Users :");
 			const char *name = root["user"];
 			Serial.println(name);
 		#endif
@@ -279,30 +279,30 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 
 void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
 	#ifdef DEBUG
-  		Serial.println("[ INFO ] Subscribe acknowledged.");
-  		Serial.print("[ INFO ]packetId: ");
+  		Serial.println("[ 提醒 ] Subscribe acknowledged.");
+  		Serial.print("[ 提醒 ]packetId: ");
   		Serial.println(packetId);
-  		Serial.print("[ INFO ]  qos: ");
+  		Serial.print("[ 提醒 ]  qos: ");
   		Serial.println(qos);
 	#endif
 }
 
 void onMqttConnect(bool sessionPresent) {
 	#ifdef DEBUG
-		Serial.println("[ INFO ] MQTT Connected session");
+		Serial.println("[ 提醒 ] MQTT Connected session");
 	#endif
 	if (sessionPresent == true) {
 		#ifdef DEBUG
-			Serial.println("[ INFO ]MQTT session Present: True");
+			Serial.println("[ 提醒 ]MQTT session Present: True");
 		#endif
-		writeEvent("INFO", "mqtt", "Connected to MQTT Server", "Session Present");
+		writeEvent("提醒", "mqtt", "Connected to MQTT Server", "Session Present");
 	}
 	mqtt_publish_boot(now(), WiFi.SSID(), WiFi.localIP().toString());
 
 	uint16_t packetIdSub = mqttClient.subscribe(mqttTopic, 2);
 	
 	#ifdef DEBUG
-		Serial.print("[ INFO ] Subscribing at QoS 2, packetId: ");
+		Serial.print("[ 提醒 ] Subscribing at QoS 2, packetId: ");
   		Serial.println(packetIdSub);
 	#endif
   	

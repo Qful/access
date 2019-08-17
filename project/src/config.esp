@@ -4,7 +4,7 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	if (!configFile)
 	{
 #ifdef DEBUG
-		Serial.println(F("[ WARN ] Failed to open config file"));
+		Serial.println(F("[ 警告 ] 打开配置文件失败"));
 #endif
 		return false;
 	}
@@ -16,12 +16,12 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	if (!json.success())
 	{
 #ifdef DEBUG
-		Serial.println(F("[ WARN ] Failed to parse config file"));
+		Serial.println(F("[ 警告 ] Failed to parse config file"));
 #endif
 		return false;
 	}
 #ifdef DEBUG
-	Serial.println(F("[ INFO ] Config file found"));
+	Serial.println(F("[ 提醒 ] Config file found"));
 	json.prettyPrintTo(Serial);
 	Serial.println();
 #endif
@@ -30,9 +30,11 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	JsonObject &general = json["general"];
 	JsonObject &mqtt = json["mqtt"];
 	JsonObject &ntp = json["ntp"];
+
 #ifdef DEBUG
-	Serial.println(F("[ INFO ] Trying to setup RFID Hardware"));
+	Serial.println(F("[ 提醒 ] 配置硬件外设：wifipin"));
 #endif
+
 	if (hardware.containsKey("wifipin"))
 	{
 		wifipin = hardware["wifipin"];
@@ -42,7 +44,9 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 			digitalWrite(wifipin, LEDoff);
 		}
 	}
-
+#ifdef DEBUG
+	Serial.println(F("[ 提醒 ] 配置硬件外设：doorstatpin"));
+#endif
 	if (hardware.containsKey("doorstatpin"))
 	{
 		doorstatpin = hardware["doorstatpin"];
@@ -51,7 +55,9 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 			pinMode(doorstatpin, INPUT);
 		}
 	}
-
+#ifdef DEBUG
+	Serial.println(F("[ 提醒 ] 配置硬件外设：openlockpin"));
+#endif
 	if (hardware.containsKey("openlockpin"))
 	{
 		openlockpin = hardware["openlockpin"];
@@ -65,13 +71,23 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 #ifdef OFFICIALBOARD
 	setupWiegandReader(5, 4);
 #endif
+		#ifdef DEBUG
+		Serial.println(F("[ 提醒 ] mark "));
+		#endif
+
 #ifndef OFFICIALBOARD
 	readertype = hardware["readertype"];
 	if (readertype == 1 || readertype == 5)
 	{
+		#ifdef DEBUG
+		Serial.println(F("[ 提醒 ] setupWiegandReader "));
+		#endif
 		int wgd0pin = hardware["wgd0pin"];
 		int wgd1pin = hardware["wgd1pin"];
-		setupWiegandReader(wgd0pin, wgd1pin); // also some other settings like weather to use keypad or not, LED pin, BUZZER pin, Wiegand 26/34 version
+		setupWiegandReader(wgd0pin, wgd1pin); 		// also some other settings like weather to use keypad or not, LED pin, BUZZER pin, Wiegand 26/34 version
+		#ifdef DEBUG
+		Serial.println(F("[ 提醒 ] setupWiegandReader ned "));
+		#endif
 	}
 	else if (readertype == 0 || readertype == 4)
 	{
@@ -88,10 +104,17 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 		rfidss = hardware["sspin"];
 		setupPN532Reader(rfidss);
 	}
+
 	#ifndef DEBUG
 	if (readertype>2) Serial.begin(9600);
 	#endif
+
 #endif
+
+	#ifdef DEBUG
+	Serial.println(F("[ 提醒 ] test mark"));
+	#endif
+
 	autoRestartIntervalSeconds = general["restart"];
 	wifiTimeout = network["offtime"];
 	const char *bssidmac = network["bssid"];
@@ -102,7 +125,7 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	if (!MDNS.begin(deviceHostname))
 	{
 #ifdef DEBUG
-		Serial.println("[ WARN ]Error setting up MDNS responder!");
+		Serial.println("[ 警告 ]Error setting up MDNS responder!");
 #endif
 	}
 	MDNS.addService("http", "tcp", 80);
@@ -119,6 +142,9 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	digitalWrite(relayPin, !relayType);
 #endif
 
+#ifdef DEBUG
+	Serial.println(F("[ 提醒 ] 配置硬件：network"));
+#endif
 	const char *ssid = network["ssid"];
 	const char *password = network["pswd"];
 	wmode = network["wmode"];
@@ -128,7 +154,7 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	{
 		int hid = network["hide"];
 #ifdef DEBUG
-		Serial.println(F("[ INFO ] 设备AP模式"));
+		Serial.println(F("[ 提醒 ] 设备AP模式"));
 #endif
 		const char *APssid;
 		if (network.containsKey("ssid"))
@@ -165,6 +191,9 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	}
 	else
 	{
+		#ifdef DEBUG
+		Serial.println(F("[ 提醒 ] WIFI_STA"));
+		#endif
 		if (network["dhcp"] == "0")
 		{
 			WiFi.mode(WIFI_STA);
@@ -188,20 +217,21 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 		}
 	}
 #ifdef DEBUG
-	Serial.println("[ INFO ] Trying to setup NTP Server");
+	Serial.println("[ 提醒 ] Trying to setup NTP Server");
 #endif
+
 	/*
 	IPAddress timeserverip;
 	WiFi.hostByName(ntpserver, timeserverip);
 	String ip = printIP(timeserverip);
-	writeEvent("INFO", "ntp", "Connecting NTP Server", ip);
+	writeEvent("提醒", "ntp", "Connecting NTP Server", ip);
 	*/
 	NTP.Ntp(ntpserver, timeZone, ntpinter * 60);
 	mqttenabled = mqtt["enabled"];
 	if (mqttenabled == 1)
 	{
 #ifdef DEBUG
-		Serial.println("[ INFO ] Trying to setup MQTT");
+		Serial.println("[ 提醒 ] Trying to setup MQTT");
 #endif
 		String mhsString = mqtt["host"];
 		mhs = strdup(mhsString.c_str());
@@ -232,12 +262,12 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 		mqttClient.onConnect(onMqttConnect);
 		mqttClient.onMessage(onMqttMessage);
 #ifdef DEBUG
-		Serial.println("[ INFO ] try to call mqttconnect ");
+		Serial.println("[ 提醒 ] try to call mqttconnect ");
 #endif
 		connectToMqtt();
 	}
 #ifdef DEBUG
-	Serial.println(F("[ INFO ] Configuration done."));
+	Serial.println(F("[ 提醒 ] Configuration done."));
 #endif
 	return true;
 }

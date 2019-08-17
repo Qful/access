@@ -10,7 +10,7 @@ void ICACHE_FLASH_ATTR procMsg(AsyncWebSocketClient *client, size_t sz)
 	if (!root.success())
 	{
 #ifdef DEBUG
-		Serial.println(F("[ WARN ] Couldn't parse WebSocket message"));
+		Serial.println(F("[ 警告 ] Couldn't parse WebSocket message"));
 #endif
 		free(client->_tempObject);
 		client->_tempObject = NULL;
@@ -38,9 +38,9 @@ void ICACHE_FLASH_ATTR procMsg(AsyncWebSocketClient *client, size_t sz)
 			f.close();
 			shouldReboot = true;
 			//ESP.restart();
-			writeEvent("INFO", "sys", "Config stored in the SPIFFS", String(len) + " bytes");
+			writeEvent("提醒", "sys", "Config stored in the SPIFFS", String(len) + " bytes");
 #ifdef DEBUG
-			Serial.print(F("[ INFO ] Config stored in the SPIFFS ("));
+			Serial.print(F("[ 提醒 ] Config stored in the SPIFFS ("));
 			Serial.print(len);
 			Serial.println(F(" bytes)"));
 #endif
@@ -76,12 +76,12 @@ void ICACHE_FLASH_ATTR procMsg(AsyncWebSocketClient *client, size_t sz)
 	else if (strcmp(command, "clearevent") == 0)
 	{
 		SPIFFS.remove("/eventlog.json");
-		writeEvent("WARN", "sys", "Event log cleared!", "");
+		writeEvent("警告", "sys", "Event log cleared!", "");
 	}
 	else if (strcmp(command, "clearlatest") == 0)
 	{
 		SPIFFS.remove("/latestlog.json");
-		writeEvent("WARN", "sys", "Latest Access log cleared!", "");
+		writeEvent("警告", "sys", "Latest Access log cleared!", "");
 	}
 	else if (strcmp(command, "userfile") == 0)
 	{
@@ -143,7 +143,7 @@ void ICACHE_FLASH_ATTR onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *c
 	if (type == WS_EVT_ERROR)
 	{
 #ifdef DEBUG
-		Serial.printf("[ WARN ] WebSocket[%s][%u] error(%u): %s\r\n", server->url(), client->id(), *((uint16_t *)arg), (char *)data);
+		Serial.printf("[ 警告 ] WebSocket[%s][%u] error(%u): %s\r\n", server->url(), client->id(), *((uint16_t *)arg), (char *)data);
 #endif
 	}
 	else if (type == WS_EVT_DATA)

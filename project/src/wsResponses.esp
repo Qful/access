@@ -51,7 +51,7 @@ void ICACHE_FLASH_ATTR sendStatus() {
 	FSInfo fsinfo;
 	if (!SPIFFS.info(fsinfo)) {
 #ifdef DEBUG
-		Serial.print(F("[ WARN ] Error getting info on SPIFFS"));
+		Serial.print(F("[ 警告 ] Error getting info on SPIFFS"));
 #endif
 	}
 	DynamicJsonBuffer jsonBuffer;

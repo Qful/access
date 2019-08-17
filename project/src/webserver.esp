@@ -14,13 +14,13 @@ void ICACHE_FLASH_ATTR setupWebServer() {
 			return;
 		}
 		if (!index) {
-			writeEvent("INFO", "updt", "Firmware update started", filename.c_str());
+			writeEvent("提醒", "updt", "Firmware update started", filename.c_str());
 #ifdef DEBUG
 			Serial.printf("[ UPDT ] Firmware update started: %s\n", filename.c_str());
 #endif
 			Update.runAsync(true);
 			if (!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)) {
-				writeEvent("ERRO", "updt", "Not enough space to update","");
+				writeEvent("错误", "updt", "Not enough space to update","");
 				#ifdef DEBUG
 				Update.printError(Serial);
 				#endif
@@ -28,7 +28,7 @@ void ICACHE_FLASH_ATTR setupWebServer() {
 		}
 		if (!Update.hasError()) {
 			if (Update.write(data, len) != len) {
-				writeEvent("ERRO", "updt", "Writing to flash is failed", filename.c_str());
+				writeEvent("错误", "updt", "Writing to flash is failed", filename.c_str());
 				#ifdef DEBUG
 				Update.printError(Serial);
 				#endif
@@ -36,13 +36,13 @@ void ICACHE_FLASH_ATTR setupWebServer() {
 		}
 		if (final) {
 			if (Update.end(true)) {
-				writeEvent("INFO", "updt", "Firmware update is finished", "");
+				writeEvent("提醒", "updt", "Firmware update is finished", "");
 #ifdef DEBUG
 				Serial.printf("[ UPDT ] Firmware update finished: %uB\n", index + len);
 #endif
 				shouldReboot = !Update.hasError();
 			} else {
-				writeEvent("ERRO", "updt", "Update is failed", "");
+				writeEvent("错误", "updt", "Update is failed", "");
 				#ifdef DEBUG
 				Update.printError(Serial);
 				#endif
@@ -88,11 +88,11 @@ void ICACHE_FLASH_ATTR setupWebServer() {
 	server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request) {
 		String remoteIP = printIP(request->client()->remoteIP());
 		if (!request->authenticate(http_username, http_pass)) {
-			writeEvent("WARN", "websrv", "New login attempt", remoteIP);
+			writeEvent("警告", "websrv", "New login attempt", remoteIP);
 			return request->requestAuthentication();
 		}
 		request->send(200, "text/plain", "Success");
-		writeEvent("INFO", "websrv", "Login success!", remoteIP);
+		writeEvent("提醒", "websrv", "Login success!", remoteIP);
 	});
 	server.rewrite("/", "/index.html");
 	server.begin();

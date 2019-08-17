@@ -17,7 +17,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 		mfrc522.PICC_HaltA();
 		cooldown = millis() + 2000;
 		#ifdef DEBUG
-		Serial.print(F("[ INFO ] PICC's UID: "));
+		Serial.print(F("[ 提醒 ] PICC's UID: "));
 		#endif
 		for (int i = 0; i < mfrc522.uid.size; ++i)
 		{
@@ -37,7 +37,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 		if (wg.available())
 		{
 #ifdef DEBUG
-			Serial.print(F("[ INFO ] PICC's UID: "));
+			Serial.print(F("[ 提醒 ] PICC's UID: "));
 			Serial.println(wg.getCode());
 #endif
 			uid = String(wg.getCode(), DEC);
@@ -59,7 +59,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 		if (found && u8_UidLength >= 4)
 		{
 #ifdef DEBUG
-			Serial.print(F("[ INFO ] PICC's UID: "));
+			Serial.print(F("[ 提醒 ] PICC's UID: "));
 #endif
 			for (uint8_t i = 0; i < u8_UidLength; i++)
 			{
@@ -89,7 +89,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 			type = RFIDr.GetTagType();
 			cooldown = millis() + 2000;
 #ifdef DEBUG
-			Serial.print(F("[ INFO ] PICC's UID: "));
+			Serial.print(F("[ 提醒 ] PICC's UID: "));
 			Serial.print(uid);
 #endif
 		}
@@ -117,7 +117,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 			mfrc522.PICC_HaltA();
 			cooldown = millis() + 2000;
 #ifdef DEBUG
-			Serial.print(F("[ INFO ] PICC's UID: "));
+			Serial.print(F("[ 提醒 ] PICC's UID: "));
 #endif
 			for (int i = 0; i < mfrc522.uid.size; ++i)
 			{
@@ -138,7 +138,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 			if (wg.available())
 			{
 #ifdef DEBUG
-				Serial.print(F("[ INFO ] PICC's UID: "));
+				Serial.print(F("[ 提醒 ] PICC's UID: "));
 				Serial.println(wg.getCode());
 #endif
 				uid = String(wg.getCode(), DEC);
@@ -161,7 +161,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 			if (found && u8_UidLength >= 4)
 			{
 #ifdef DEBUG
-				Serial.print(F("[ INFO ] PICC's UID: "));
+				Serial.print(F("[ 提醒 ] PICC's UID: "));
 #endif
 				for (uint8_t i = 0; i < u8_UidLength; i++)
 				{
@@ -191,7 +191,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 	{
 
 #ifdef DEBUG
-		Serial.print(F("[ INFO ] PICC's UID: "));
+		Serial.print(F("[ 提醒 ] PICC's UID: "));
 		Serial.print(wg.getCode());
 #endif
 
@@ -223,7 +223,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 			AccType = json["acctype"];
 #ifdef DEBUG
 			Serial.println(" = known PICC");
-			Serial.print("[ INFO ] User Name: ");
+			Serial.print("[ 提醒 ] User Name: ");
 			if (username == "undefined")
 				Serial.print(uid);
 			else
@@ -303,7 +303,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 		{
 #ifdef DEBUG
 			Serial.println("");
-			Serial.println(F("[ WARN ] Failed to parse User Data"));
+			Serial.println(F("[ 警告 ] Failed to parse User Data"));
 #endif
 		}
 		f.close();
@@ -312,7 +312,7 @@ void ICACHE_FLASH_ATTR rfidloop()
 	{
 		String data = String(uid);
 		data += " " + String(type);
-		writeEvent("WARN", "rfid", "Unknown rfid tag is scanned", data);
+		writeEvent("警告", "rfid", "Unknown rfid tag is scanned", data);
 		writeLatest(uid, "Unknown", 98);
 #ifdef DEBUG
 		Serial.println(" = unknown PICC");
@@ -348,7 +348,7 @@ void ICACHE_FLASH_ATTR ShowMFRC522ReaderDetails()
 {
 	// Get the MFRC522 software version
 	byte v = mfrc522.PCD_ReadRegister(mfrc522.VersionReg);
-	Serial.print(F("[ INFO ] MFRC522 Version: 0x"));
+	Serial.print(F("[ 提醒 ] MFRC522 Version: 0x"));
 	Serial.print(v, HEX);
 	if (v == 0x91)
 		Serial.print(F(" = v1.0"));
@@ -362,7 +362,7 @@ void ICACHE_FLASH_ATTR ShowMFRC522ReaderDetails()
 	// When 0x00 or 0xFF is returned, communication probably failed
 	if ((v == 0x00) || (v == 0xFF))
 	{
-		Serial.println(F("[ WARN ] Communication failure, check if MFRC522 properly connected"));
+		Serial.println(F("[ 警告 ] Communication failure, check if MFRC522 properly connected"));
 	}
 }
 #endif
@@ -377,7 +377,7 @@ void ICACHE_FLASH_ATTR setupMFRC522Reader(int rfidss, int rfidgain)
 	// This may not work with some boards
 	mfrc522.PCD_SetAntennaGain(rfidgain);
 #ifdef DEBUG
-	Serial.printf("[ INFO ] RFID SS_PIN: %u and Gain Factor: %u", rfidss, rfidgain);
+	Serial.printf("[ 提醒 ] RFID SS_PIN: %u and Gain Factor: %u", rfidss, rfidgain);
 	Serial.println("");
 #endif
 #ifdef DEBUG

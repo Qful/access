@@ -1,16 +1,15 @@
 
-#define VERSION "0.1.2"
+#define VERSION "0.1.3"
 
-//#include "Arduino.h"
+#include "Arduino.h"
 #include <ESP8266WiFi.h>
-//#include <SPI.h>
+#include <SPI.h>
 #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-//#include <TimeLib.h>
-
+#include <TimeLib.h>
 #include <Ticker.h>
 #include "Ntp.h"
 #include <AsyncMqttClient.h>
@@ -21,7 +20,7 @@
 #ifndef OFFICIALBOARD
 
 //#include <SoftwareSerial.h>
-#include <RDM6300.h>
+// #include <RDM6300.h>
 #include <MFRC522.h>
 #include "PN532.h"
 #include <Wiegand.h>
@@ -119,10 +118,10 @@ unsigned long interval 	= 1800;  // Add to GUI & json config
 bool mqttEvents 		= false; // Sends events over MQTT disables SPIFFS file logging
 
 
-#define RFID_RX_PIN 13
-#define RFID_TX_PIN 15
+// #define RFID_RX_PIN 13
+// #define RFID_TX_PIN 15
 
-RDM6300 RDM(RFID_RX_PIN, RFID_TX_PIN);
+// RDM6300 RDM(RFID_RX_PIN, RFID_TX_PIN);
 
 #include "log.esp"
 #include "mqtt.esp"
@@ -136,34 +135,34 @@ RDM6300 RDM(RFID_RX_PIN, RFID_TX_PIN);
 #include "door.esp"
 
 
-int tag;
+// int tag;
 
-void  setup() {
-  Serial.begin(115200);
-  Serial.println("Serial Ready");
+// void  setup() {
+//   Serial.begin(115200);
+//   Serial.println("Serial Ready");
 
-}
+// }
 
-void  loop() {
-  if(RDM.isIdUartAvailable()) {
-    //tag = RDM.readId();
-    Serial.print("isIdUartAvailable");
-    Serial.println(RDM.realTagString);
-  }
-  if(RDM.isIdAvailable()) {
-  tag = RDM.readId();
-    Serial.print("ID: ");
-    Serial.println(tag,HEX);
-  }
-}
+// void  loop() {
+//   if(RDM.isIdUartAvailable()) {
+//     //tag = RDM.readId();
+//     Serial.print("isIdUartAvailable");
+//     Serial.println(RDM.realTagString);
+//   }
+//   if(RDM.isIdAvailable()) {
+//   tag = RDM.readId();
+//     Serial.print("ID: ");
+//     Serial.println(tag,HEX);
+//   }
+// }
 
-void ICACHE_FLASH_ATTR setup1()
+void ICACHE_FLASH_ATTR setup()
 {
 #ifdef DEBUG
 	Serial.begin(115200);
 	Serial.println();
 
-	Serial.print(F("[ INFO ] Q RFID v"));
+	Serial.print(F("[ 提醒 ] Q RFID v"));
 	Serial.println(VERSION);
 
 	uint32_t realSize = ESP.getFlashChipRealSize();
@@ -187,11 +186,11 @@ void ICACHE_FLASH_ATTR setup1()
 	if (!SPIFFS.begin())
 	{
 #ifdef DEBUG
-		Serial.print(F("[ WARN ] Formatting filesystem..."));
+		Serial.print(F("[ 警告 ] Formatting filesystem..."));
 #endif
 		if (SPIFFS.format())
 		{
-			writeEvent("WARN", "sys", "Filesystem formatted", "");
+			writeEvent("警告", "sys", "Filesystem formatted", "");
 
 #ifdef DEBUG
 			Serial.println(F(" completed!"));
@@ -201,7 +200,7 @@ void ICACHE_FLASH_ATTR setup1()
 		{
 #ifdef DEBUG
 			Serial.println(F(" failed!"));
-			Serial.println(F("[ WARN ] Could not format filesystem!"));
+			Serial.println(F("[ 警告 ] Could not format filesystem!"));
 #endif
 		}
 	}
@@ -217,10 +216,10 @@ void ICACHE_FLASH_ATTR setup1()
 		configMode = true;
 	}
 	setupWebServer();
-	writeEvent("INFO", "sys", "System setup completed, running", "");
+	writeEvent("提醒", "sys", "System setup completed, running", "");
 }
 
-void ICACHE_RAM_ATTR loop1()
+void ICACHE_RAM_ATTR loop()
 {
 	currentMillis = millis();
 	deltaTime = currentMillis - previousLoopMillis;
@@ -324,7 +323,7 @@ void ICACHE_RAM_ATTR loop1()
 	if (formatreq)
 	{
 #ifdef DEBUG
-		Serial.println(F("[ WARN ] 恢复出厂设置..."));
+		Serial.println(F("[ 警告 ] 恢复出厂设置..."));
 #endif
 		SPIFFS.end();
 		ws.enable(false);
@@ -340,18 +339,18 @@ void ICACHE_RAM_ATTR loop1()
 
 	if (autoRestartIntervalSeconds > 0 && uptime > autoRestartIntervalSeconds * 1000)
 	{
-		writeEvent("INFO", "sys", "设备重启", "");
+		writeEvent("提醒", "sys", "设备重启", "");
 #ifdef DEBUG
-		Serial.println(F("[ WARN ] 设备重启..."));
+		Serial.println(F("[ 警告 ] 设备重启..."));
 #endif
 		shouldReboot = true;
 	}
 
 	if (shouldReboot)
 	{
-		writeEvent("INFO", "sys", "系统计划重启", "");
+		writeEvent("提醒", "sys", "系统计划重启", "");
 #ifdef DEBUG
-		Serial.println(F("[ INFO ] 系统即将重启..."));
+		Serial.println(F("[ 提醒 ] 系统即将重启..."));
 #endif
 		ESP.restart();
 	}
@@ -363,7 +362,7 @@ void ICACHE_RAM_ATTR loop1()
 
 	if (wifiTimeout > 0 && wiFiUptimeMillis > (wifiTimeout * 1000) && isWifiConnected == true)
 	{
-		writeEvent("INFO", "wifi", "WiFi is going to be disabled", "");
+		writeEvent("提醒", "wifi", "WiFi is going to be disabled", "");
 		doDisableWifi = true;
 	}
 
@@ -375,7 +374,7 @@ void ICACHE_RAM_ATTR loop1()
 	}
 	else if (doEnableWifi == true)
 	{
-		writeEvent("INFO", "wifi", "Enabling WiFi", "");
+		writeEvent("提醒", "wifi", "Enabling WiFi", "");
 		doEnableWifi = false;
 		if (!isWifiConnected)
 		{
@@ -393,7 +392,7 @@ void ICACHE_RAM_ATTR loop1()
 				mqtt_publish_heartbeat(now());
 				nextbeat = (unsigned)now() + interval;
 #ifdef DEBUG
-				Serial.print("[ INFO ] Nextbeat=");
+				Serial.print("[ 提醒 ] Nextbeat=");
 				Serial.println(nextbeat);
 #endif
 			}
