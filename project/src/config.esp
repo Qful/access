@@ -25,15 +25,12 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	json.prettyPrintTo(Serial);
 	Serial.println();
 #endif
+
 	JsonObject &network = json["network"];
 	JsonObject &hardware = json["hardware"];
 	JsonObject &general = json["general"];
 	JsonObject &mqtt = json["mqtt"];
 	JsonObject &ntp = json["ntp"];
-
-#ifdef DEBUG
-	Serial.println(F("[ 提醒 ] 配置硬件外设：wifipin"));
-#endif
 
 	if (hardware.containsKey("wifipin"))
 	{
@@ -44,9 +41,6 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 			digitalWrite(wifipin, LEDoff);
 		}
 	}
-#ifdef DEBUG
-	Serial.println(F("[ 提醒 ] 配置硬件外设：doorstatpin"));
-#endif
 	if (hardware.containsKey("doorstatpin"))
 	{
 		doorstatpin = hardware["doorstatpin"];
@@ -55,9 +49,7 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 			pinMode(doorstatpin, INPUT);
 		}
 	}
-#ifdef DEBUG
-	Serial.println(F("[ 提醒 ] 配置硬件外设：openlockpin"));
-#endif
+
 	if (hardware.containsKey("openlockpin"))
 	{
 		openlockpin = hardware["openlockpin"];
@@ -105,15 +97,11 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 		setupPN532Reader(rfidss);
 	}
 
-	#ifndef DEBUG
+	//#ifndef DEBUG
 	if (readertype>2) Serial.begin(9600);
-	#endif
+	//#endif
 
 #endif
-
-	#ifdef DEBUG
-	Serial.println(F("[ 提醒 ] test mark"));
-	#endif
 
 	autoRestartIntervalSeconds = general["restart"];
 	wifiTimeout = network["offtime"];
@@ -142,9 +130,6 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	digitalWrite(relayPin, !relayType);
 #endif
 
-#ifdef DEBUG
-	Serial.println(F("[ 提醒 ] 配置硬件：network"));
-#endif
 	const char *ssid = network["ssid"];
 	const char *password = network["pswd"];
 	wmode = network["wmode"];
@@ -191,9 +176,6 @@ bool ICACHE_FLASH_ATTR loadConfiguration()
 	}
 	else
 	{
-		#ifdef DEBUG
-		Serial.println(F("[ 提醒 ] WIFI_STA"));
-		#endif
 		if (network["dhcp"] == "0")
 		{
 			WiFi.mode(WIFI_STA);

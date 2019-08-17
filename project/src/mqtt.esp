@@ -180,8 +180,9 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 	String espIp =  WiFi.localIP().toString();
 	Serial.println(espIp);
 	StaticJsonBuffer<255> jsonBuffer;
+
 	#ifdef DEBUG
-		Serial.print("[ 提醒 ] JSON msg :");
+		Serial.print("[ 提醒 ] Mqtt JSON msg :");
 		Serial.println(jjson);
 	#endif
 

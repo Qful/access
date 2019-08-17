@@ -1,9 +1,8 @@
 
-#define VERSION "0.1.3"
+#define VERSION "0.1.5"
 
 #include "Arduino.h"
 #include <ESP8266WiFi.h>
-#include <SPI.h>
 #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 #include <FS.h>
@@ -15,16 +14,17 @@
 #include <AsyncMqttClient.h>
 #include <btn.h>
 
- // #define DEBUG
-
-#ifndef OFFICIALBOARD
-
-//#include <SoftwareSerial.h>
-// #include <RDM6300.h>
 #include <MFRC522.h>
 #include "PN532.h"
 #include <Wiegand.h>
 #include "rfid125kHz.h"
+
+//#include <SoftwareSerial.h>
+// #include <RDM6300.h>
+// #define RFID_RX_PIN 13
+// #define RFID_TX_PIN 15
+
+// RDM6300 RDM(RFID_RX_PIN, RFID_TX_PIN);
 
 MFRC522 mfrc522 = MFRC522();
 PN532 pn532;
@@ -35,7 +35,9 @@ int rfidss;
 int readertype;
 int relayPin;
 
-#endif
+//#ifndef OFFICIALBOARD
+//#endif
+ // #define DEBUG
 
 // these are from vendors
 #include "webh/glyphicons-halflings-regular.woff.gz.h"
@@ -72,6 +74,7 @@ uint8_t doorstatpin = 255;
 uint8_t lastDoorState = 0;
 
 uint8_t openlockpin = 255;
+
 #define LEDoff HIGH
 #define LEDon LOW
 
@@ -115,13 +118,9 @@ int timeZone;
 unsigned long nextbeat = 0;
 
 unsigned long interval 	= 1800;  // Add to GUI & json config
-bool mqttEvents 		= false; // Sends events over MQTT disables SPIFFS file logging
+bool mqttEvents = false; // Sends events over MQTT disables SPIFFS file logging
 
 
-// #define RFID_RX_PIN 13
-// #define RFID_TX_PIN 15
-
-// RDM6300 RDM(RFID_RX_PIN, RFID_TX_PIN);
 
 #include "log.esp"
 #include "mqtt.esp"
@@ -159,10 +158,11 @@ bool mqttEvents 		= false; // Sends events over MQTT disables SPIFFS file loggin
 void ICACHE_FLASH_ATTR setup()
 {
 #ifdef DEBUG
-	Serial.begin(115200);
+
+	Serial.begin(9600);
 	Serial.println();
 
-	Serial.print(F("[ 提醒 ] Q RFID v"));
+	Serial.print(F("Q RFID v"));
 	Serial.println(VERSION);
 
 	uint32_t realSize = ESP.getFlashChipRealSize();
@@ -191,15 +191,14 @@ void ICACHE_FLASH_ATTR setup()
 		if (SPIFFS.format())
 		{
 			writeEvent("警告", "sys", "Filesystem formatted", "");
-
 #ifdef DEBUG
 			Serial.println(F(" completed!"));
 #endif
 		}
 		else
 		{
+			writeEvent("错误", "sys", "文件系统无法格式化", "");
 #ifdef DEBUG
-			Serial.println(F(" failed!"));
 			Serial.println(F("[ 警告 ] Could not format filesystem!"));
 #endif
 		}
@@ -210,13 +209,15 @@ void ICACHE_FLASH_ATTR setup()
 	if (!configMode)
 	{
 		fallbacktoAPMode();
+		writeEvent("提醒", "WIFI", "进入AP模式", "");
 		configMode = false;
 	}
-	else {
+	else 
+	{
 		configMode = true;
 	}
 	setupWebServer();
-	writeEvent("提醒", "sys", "System setup completed, running", "");
+	writeEvent("完成", "sys", "System setup init completed", "");
 }
 
 void ICACHE_RAM_ATTR loop()
@@ -272,18 +273,16 @@ void ICACHE_RAM_ATTR loop()
 			if (digitalRead(relayPin) == !relayType)
 			{
 #ifdef DEBUG
-				Serial.print("mili : ");
+				Serial.print("activating relay mili : ");
 				Serial.println(millis());
-				Serial.println("activating relay now");
 #endif
 				digitalWrite(relayPin, relayType);
 			}
 			else	// currently ON, need to switch OFF
 			{
 #ifdef DEBUG
-				Serial.print("mili : ");
+				Serial.print("deactivating relay mili : ");
 				Serial.println(millis());
-				Serial.println("deactivating relay now");
 #endif
 				digitalWrite(relayPin, !relayType);
 			}
@@ -295,9 +294,8 @@ void ICACHE_RAM_ATTR loop()
 		if (activateRelay)
 		{
 #ifdef DEBUG
-			Serial.print("mili : ");
+			Serial.print("activating relay momentary mili : ");
 			Serial.println(millis());
-			Serial.println("activating relay now");
 #endif
 			digitalWrite(relayPin, relayType);
 			previousMillis = millis();
@@ -311,8 +309,7 @@ void ICACHE_RAM_ATTR loop()
 			Serial.println(previousMillis);
 			Serial.println(activateTime);
 			Serial.println(activateRelay);
-			Serial.println("deactivate relay after this");
-			Serial.print("mili : ");
+			Serial.print("deactivate relay after mili : ");
 			Serial.println(millis());
 #endif
 			digitalWrite(relayPin, !relayType);
@@ -362,7 +359,7 @@ void ICACHE_RAM_ATTR loop()
 
 	if (wifiTimeout > 0 && wiFiUptimeMillis > (wifiTimeout * 1000) && isWifiConnected == true)
 	{
-		writeEvent("提醒", "wifi", "WiFi is going to be disabled", "");
+		writeEvent("提醒", "WiFi", "WiFi 将关闭", "");
 		doDisableWifi = true;
 	}
 
@@ -374,7 +371,7 @@ void ICACHE_RAM_ATTR loop()
 	}
 	else if (doEnableWifi == true)
 	{
-		writeEvent("提醒", "wifi", "Enabling WiFi", "");
+		writeEvent("提醒", "wifi", "WiFi将打开", "");
 		doEnableWifi = false;
 		if (!isWifiConnected)
 		{
@@ -392,7 +389,7 @@ void ICACHE_RAM_ATTR loop()
 				mqtt_publish_heartbeat(now());
 				nextbeat = (unsigned)now() + interval;
 #ifdef DEBUG
-				Serial.print("[ 提醒 ] Nextbeat=");
+				Serial.print("[ 提醒 ] 心跳= ");
 				Serial.println(nextbeat);
 #endif
 			}
