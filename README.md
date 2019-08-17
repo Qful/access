@@ -4,13 +4,12 @@
 
 ## [RFID简介](https://github.com/Qful/RFID)
 
-[RFID](https://github.com/Qful/RFID)项目
+[RFID](https://github.com/Qful/RFID)项目基于ESP8266开发
 
 
 ### [工程目录](https://github.com/Qful/RFID)
 
 * [文档](docs/)
-* [资源](src/)
 * [工程](project/)
 
 ### [关联资源](https://github.com/Qful)
