@@ -1,22 +1,9 @@
 ﻿# [RFID](https://github.com/Qful/RFID)
 
-[![sites](Qful/qitas.png)](http://www.Qful.net)
+[![sites](http://182.61.61.133/link/resources/Qful.png)](http://www.Qful.net)
 
 ## [RFID简介](https://github.com/Qful/RFID)
 
-[RFID](https://github.com/Qful/RFID)项目基于ESP8266开发
-
-
-### [工程目录](https://github.com/Qful/RFID)
-
-* [文档](docs/)
-* [工程](project/)
-
-### [关联资源](https://github.com/Qful)
-
-* [Q智慧](https://github.com/tfzoo)
-* [Q效率](https://github.com/qitas)
-* [Q方案](https://github.com/OS-Q)
-* [Q载体](https://github.com/sochub)
+射频识别 [RFID](https://github.com/Qful/RFID) (Radio Frequency Identification)，阅读器与标签之间进行非接触式数据通信，具有高效有针对性的通信优势。
 
 ### www.Qful.net
