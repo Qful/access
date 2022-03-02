@@ -35,7 +35,7 @@
 #define _BV(bit) (1 << (bit))
 #endif
 
-#define PN532_DELAY(ms) vTaskDelay(ms / portTICK_RATE_MS)
+#define PN532_DELAY(ms) vTaskDelay(ms / portTICK_PERIOD_MS)
 
 static uint8_t pn532ack[] = {0x00, 0x00, 0xFF, 0x00, 0xFF, 0x00};
 static uint8_t pn532response_firmwarevers[] = {0x00, 0xFF, 0x06, 0xFA, 0xD5, 0x03};
@@ -56,10 +56,10 @@ void pn532_spi_init(pn532_t *obj, uint8_t clk, uint8_t miso, uint8_t mosi, uint8
     obj->_mosi = mosi;
     obj->_ss = ss;
 
-    gpio_pad_select_gpio(obj->_clk);
-    gpio_pad_select_gpio(obj->_miso);
-    gpio_pad_select_gpio(obj->_mosi);
-    gpio_pad_select_gpio(obj->_ss);
+    esp_rom_gpio_pad_select_gpio(obj->_clk);
+    esp_rom_gpio_pad_select_gpio(obj->_miso);
+    esp_rom_gpio_pad_select_gpio(obj->_mosi);
+    esp_rom_gpio_pad_select_gpio(obj->_ss);
 
     gpio_set_direction(obj->_ss, GPIO_MODE_OUTPUT);
     gpio_set_level(obj->_ss, 1);
