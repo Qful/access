@@ -31,8 +31,8 @@ typedef struct touch_msg {
 static const touch_pad_t button[TOUCH_BUTTON_NUM] = {
     TOUCH_PAD_NUM7,     // 'SELECT' button.
     TOUCH_PAD_NUM9,     // 'MENU' button.
-    TOUCH_PAD_NUM11,    // 'BACK' button.
-    TOUCH_PAD_NUM13,    // Guard ring for waterproof design.
+    TOUCH_PAD_NUM1,     // 'BACK' button.
+    TOUCH_PAD_NUM5,    // Guard ring for waterproof design.
     // If this pad be touched, other pads no response.
 };
 
@@ -43,9 +43,9 @@ static const touch_pad_t button[TOUCH_BUTTON_NUM] = {
  * If (raw_data - benchmark) < benchmark * threshold, the pad be inactivated.
  */
 static const float button_threshold[TOUCH_BUTTON_NUM] = {
-    0.2, // 20%.
-    0.2, // 20%.
-    0.2, // 20%.
+    0.1, // 20%.
+    0.1, // 20%.
+    0.1, // 20%.
     0.1, // 10%.
 };
 
