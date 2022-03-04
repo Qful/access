@@ -249,10 +249,10 @@ void app_main(void)
     /* set touchpad wakeup threshold */
     uint32_t touch_value, wake_threshold;
     touch_pad_sleep_channel_read_smooth(TOUCH_PAD_NUM9, &touch_value);
-    wake_threshold = touch_value * 0.1; // wakeup when touch sensor crosses 10% of background level
+    wake_threshold = touch_value * 0.01; // wakeup when touch sensor crosses 10% of background level
     touch_pad_sleep_set_threshold(TOUCH_PAD_NUM9, wake_threshold);
     printf("Touch pad #%d average: %d, wakeup threshold set to %d\n",
-        TOUCH_PAD_NUM9, touch_value, (uint32_t)(touch_value * 0.1));
+        TOUCH_PAD_NUM9, touch_value, wake_threshold);
 #endif
     printf("Enabling touch pad wakeup\n");
     esp_sleep_enable_touchpad_wakeup();
