@@ -7,7 +7,7 @@
 .DS_Store
 # Prerequisites
 *.d
-
+sdkconfig.old
 # Object files
 *.o
 *.ko
